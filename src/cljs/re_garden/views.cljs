@@ -1,6 +1,10 @@
 (ns re-garden.views
-    (:require [re-frame.core :as re-frame]
-              [re-com.core :as re-com]))
+  (:require [re-frame.core :as re-frame]
+            [reagent.core :as reagent]
+            [reagent-material-ui.core :refer [AppBar Card MuiThemeProvider]]
+            [re-com.core :as re-com]))
+
+
 
 
 ;; home
@@ -26,9 +30,9 @@
 ;; about
 
 (defn about-title []
-  [re-com/title
-   :label "This is the About Page."
-   :level :level1])
+  '[re-com/title
+    :label "This is the About Page." :level :level1]
+  [:h1 [:a "hello"]])
 
 (defn link-to-home-page []
   [re-com/hyperlink-href
@@ -38,7 +42,11 @@
 (defn about-panel []
   [re-com/v-box
    :gap "1em"
-   :children [[about-title] [link-to-home-page]]])
+   :children [[about-title] [:div [link-to-home-page] [:div "hello"]]]])
+
+(defn header
+  []
+  [:div.navbar "Hello world"])
 
 
 ;; main
@@ -51,6 +59,13 @@
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [:active-panel])]
     (fn []
-      [re-com/v-box
-       :height "100%"
-       :children [(panels @active-panel)]])))
+
+      '[re-com/v-box
+        :height "100%"
+        :children [[header]
+                   (panels @active-panel)]]
+      [MuiThemeProvider
+       [AppBar {
+                :style {}
+                :title "Portfolio Admin"
+                }]])))
