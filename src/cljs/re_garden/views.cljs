@@ -1,11 +1,8 @@
 (ns re-garden.views
   (:require [re-frame.core :as re-frame]
             [reagent.core :as reagent]
-            [reagent-material-ui.core :refer [AppBar Card MuiThemeProvider]]
-            [re-com.core :as re-com]))
-
-
-
+            [re-com.core :as re-com]
+            [ws.core :as ws]))
 
 ;; home
 
@@ -16,6 +13,15 @@
        :label (str "Hello from " @name ". This is the Home Page.")
        :level :level1])))
 
+(defonce ws-chan (atom  (ws/new-sock (str "ws://" (.-host js/location) "/ws"))))
+
+(defn send [msg]
+  (.send @ws-chan msg))
+
+(defn msg-sender []
+  [:div [:button {:on-click #(send "Click1")} "Send"]])
+
+
 (defn link-to-about-page []
   [re-com/hyperlink-href
    :label "go to About Page"
@@ -24,7 +30,7 @@
 (defn home-panel []
   [re-com/v-box
    :gap "1em"
-   :children [[home-title] [link-to-about-page]]])
+   :children [[home-title] [msg-sender] [link-to-about-page]]])
 
 
 ;; about
@@ -59,13 +65,9 @@
 (defn main-panel []
   (let [active-panel (re-frame/subscribe [:active-panel])]
     (fn []
+      [re-com/v-box
+       :height "100%"
+       :children [[header]
+                  (panels @active-panel)]])))
 
-      '[re-com/v-box
-        :height "100%"
-        :children [[header]
-                   (panels @active-panel)]]
-      [MuiThemeProvider
-       [AppBar {
-                :style {}
-                :title "Portfolio Admin"
-                }]])))
+
