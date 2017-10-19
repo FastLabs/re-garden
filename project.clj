@@ -23,7 +23,8 @@
 
   :min-lein-version "2.5.3"
 
-  :source-paths ["src/clj"]
+  :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["test/clj" "test/cljs" "test/cljc"]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.14"]
@@ -43,7 +44,7 @@
                                     :pretty-print? true}}]}
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["src/cljs"]
+                        :source-paths ["src/cljs" "src/cljc"]
                         :figwheel     {:on-jsload "re-garden.core/mount-root"}
                         :compiler     {:main                 re-garden.core
                                        :output-to            "resources/public/js/compiled/app.js"
