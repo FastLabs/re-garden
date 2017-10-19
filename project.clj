@@ -1,9 +1,9 @@
 (defproject re-garden "0.1.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.456"]
-                 [reagent "0.5.1"]
-                 [re-frame "0.6.0"]
-                 [re-com "0.7.0"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+                 [org.clojure/clojurescript "1.9.946"]
+                 [reagent "0.7.0"]
+                 [re-frame "0.10.1"]
+                 [re-com "0.9.0"]
                  [secretary "1.2.3"]
                  [proto-repl "0.3.1"]
                  [ring/ring-core "1.5.1"]
@@ -11,7 +11,8 @@
                  [http-kit "2.2.0"]
                  [org.clojure/java.jdbc "0.7.0-alpha1"]
                  [compojure "1.5.2"]
-                 [garden "1.3.0"]]
+                 [garden "1.3.0"]
+                 [com.rpl/specter "1.0.0"]]
 
 
 
@@ -24,10 +25,10 @@
 
   :source-paths ["src/clj"]
 
-  :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-figwheel "0.5.9"]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-figwheel "0.5.14"]
             [lein-garden "0.2.6"]
-            [lein-doo "0.1.7"]]
+            [lein-doo "0.1.8"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"
                                     "test/js"

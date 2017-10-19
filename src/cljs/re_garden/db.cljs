@@ -1,4 +1,6 @@
 (ns re-garden.db)
 
 (def default-db
-  {:name "re-frame"})
+  {:name         "re-frame"
+   :applications []
+   :sessions     []})

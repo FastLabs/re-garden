@@ -2,6 +2,8 @@
   (:require [re-frame.core :as re-frame]
             [reagent.core :as reagent]
             [re-com.core :as re-com]
+            [app-meta.views :as app-view]
+            [session.views :as session-view]
             [ws.core :as ws]))
 
 ;; home
@@ -13,13 +15,18 @@
        :label (str "Hello from " @name ". This is the Home Page.")
        :level :level1])))
 
-(defonce ws-chan (atom  (ws/new-sock (str "ws://" (.-host js/location) "/ws"))))
+;(defonce ws-chan (atom  (ws/new-sock (str "ws://" (.-host js/location) "/ws"))))
 
-(defn send [msg]
-  (.send @ws-chan msg))
+;(defn send [msg]
+;  (.send @ws-chan msg))
 
 (defn msg-sender []
-  [:div [:button {:on-click #(send "Click1")} "Send"]])
+  [:div [:button
+         {:on-click #(re-frame/dispatch
+                       [:set-applications
+                        [{:app-name "app -1" :id "app- 1"}
+                         {:app-name "app -2" :id "app- 2"}]])}
+         "Load Applications"]])
 
 
 (defn link-to-about-page []
@@ -27,18 +34,29 @@
    :label "go to About Page"
    :href "#/about"])
 
+(defn root-view
+      [apps sessions]
+  [re-com/h-box
+   :children [[re-com/box :child [app-view/app-container apps]]
+              [re-com/box :child [session-view/session-container sessions]]]])
+
 (defn home-panel []
-  [re-com/v-box
-   :gap "1em"
-   :children [[home-title] [msg-sender] [link-to-about-page]]])
+  (let [apps (re-frame/subscribe [:applications])
+        sessions (re-frame/subscribe [:sessions])]
+    (fn []
+      [re-com/v-box
+       :gap "1em"
+       :children [[home-title]
+                  [msg-sender]
+                  [root-view @apps @sessions]
+                  [link-to-about-page]]])))
 
 
 ;; about
 
 (defn about-title []
-  '[re-com/title
-    :label "This is the About Page." :level :level1]
-  [:h1 [:a "hello"]])
+  [re-com/title
+    :label "This is the About Page." :level :level1])
 
 (defn link-to-home-page []
   [re-com/hyperlink-href
@@ -52,7 +70,7 @@
 
 (defn header
   []
-  [:div.navbar "Hello world"])
+  [:div.navbar "Application Manager"])
 
 
 ;; main
