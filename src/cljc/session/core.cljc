@@ -8,6 +8,14 @@
                           :opt [::active?]))
 
 
+(s/def ::all-inst (s/coll-of ::instance))
+(s/def ::ins-count int?)
+(s/def ::inst-map (s/keys
+                    :req [::inst-count]
+                    :opt [ ::all-inst]))
+
+
+
 (defn new-session
   [inst-nr {:keys [::app/id]}]
   {::id      [inst-nr id]
@@ -21,21 +29,46 @@
   [sessions {:keys [::app/id]}]
   (filter #(= (second (::id %)) id) sessions))
 
-(defn- gen-id [sessions app-meta]
-  (let [last-session (last (scan-sessions sessions app-meta))
-        [last-id] (:id last-session)]
-    (if last-id (inc last-id) 0)))
+(defn- gen-id
+  [{:keys [::inst-count]} app-meta]
+  (inc inst-count))
 
 
 (defn start-session
   "Appends a new created session "
   ([sessions app-meta]
    (start-session sessions app-meta gen-id))
-  ([sessions app-meta s-id-gen]
-   (let [new-id (apply s-id-gen sessions app-meta)
-         new-session (new-session new-id app-meta)]
-     (-> (map disable-session sessions)
-         (conj new-session)))))
+  ([{:keys [::inst-count ::all-inst]} app-meta s-id-gen]
+   (let [new-count (inc inst-count)
+         new-session (new-session new-count app-meta)
+         {:keys [::id]} new-session]
+     {::inst-count new-count
+      ::all-inst   (conj all-inst new-session)})))
+
+(defn deactivate
+  [active-now triplet]
+  (filter #(not (= active-now %)) triplet))
+
+
+(defn find-next-active
+  [all-inst]
+  (loop [[current next & inst] all-inst result []]
+    (if (::active? current)
+        (-> (conj result (assoc next ::active true))
+            (concat inst))
+      (recur (rest inst) result))))
+
+
+
+
+(defn disable-session
+  ([{:keys [::all-inst] :as sessions}]
+   (disable-session sessions (first all-inst)))
+  ([{:keys [::all-inst] :as sessions} session]
+   (let [new-inst []]
+     (assoc sessions ::all-inst new-inst))))
+
+
 
 (defn close-session [sessions session-id])
 (defn activate-session [sessions session-id])
