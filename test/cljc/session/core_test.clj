@@ -35,8 +35,19 @@
           (is (= [[2 "app-1"]] all-active)))))
 
     (testing "disable current active session"
-       (let [disabled-session (->> app-meta
-                                   (session/new-session 2)
-                                   session/disable-session)]
-         (is (s/valid? ::session/instance disabled-session)
-           (is (not (::session/active? disabled-session))))))))
+      (let [disabled-session (->> app-meta
+                                  (session/new-session 2)
+                                  session/disable-session)]
+        (is (s/valid? ::session/instance disabled-session)
+            (is (not (::session/active? disabled-session))))))))
+
+
+(deftest close-sessions
+  (testing "simple close session"
+    (let [sessions [{::session/id 1}
+                    {::session/id 2 ::session/active true}
+                    {::session/id 3}]]
+      (prn (session/close-session 2 sessions)))))
+
+
+

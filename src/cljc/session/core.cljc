@@ -49,6 +49,14 @@
   [active-now triplet]
   (filter #(not (= active-now %)) triplet))
 
+(defn close-session
+  [session-id sessions]
+  (let [[first [closed & rest]] (->> sessions
+                                     (map #(cond-> %
+                                                   (= session-id (::id %)) (assoc :closed? true)))
+                                     (split-with #(not (:closed? %))))]
+    (concat first rest)))
+
 
 (defn find-next-active
   [all-inst]
@@ -70,7 +78,6 @@
 
 
 
-(defn close-session [sessions session-id])
 (defn activate-session [sessions session-id])
 
 
