@@ -12,7 +12,7 @@
 (s/def ::ins-count int?)
 (s/def ::inst-map (s/keys
                     :req [::inst-count]
-                    :opt [ ::all-inst]))
+                    :opt [::all-inst]))
 
 
 
@@ -21,8 +21,6 @@
   {::id      [inst-nr id]
    ::active? true})
 
-(defn disable-session [session]
-  (dissoc session ::active?))
 
 (defn scan-sessions
   "Finds all sessions for a particular application"
@@ -45,30 +43,6 @@
      {::inst-count new-count
       ::all-inst   (conj all-inst new-session)})))
 
-(defn deactivate
-  [active-now triplet]
-  (filter #(not (= active-now %)) triplet))
-
-(defn close-session
-  [session-id sessions]
-  (let [[first [closed & rest]] (->> sessions
-                                     (map #(cond-> %
-                                                   (= session-id (::id %)) (assoc :closed? true)))
-                                     (split-with #(not (:closed? %))))]
-    (concat first rest)))
-
-
-(defn find-next-active
-  [all-inst]
-  (loop [[current next & inst] all-inst result []]
-    (if (::active? current)
-        (-> (conj result (assoc next ::active true))
-            (concat inst))
-      (recur (rest inst) result))))
-
-
-
-
 (defn disable-session
   ([{:keys [::all-inst] :as sessions}]
    (disable-session sessions (first all-inst)))
@@ -77,7 +51,36 @@
      (assoc sessions ::all-inst new-inst))))
 
 
+(defn activate-tab [tab]
+  (assoc tab ::active? true))
 
-(defn activate-session [sessions session-id])
+(defn- find-first-indexed
+  "Find first occurrence of the tab and return the tuple [tab-index tab]"
+  [predicate all-tabs]
+  (->> all-tabs
+       (map-indexed vector)
+       (filter #(predicate (second %)))
+       first))
 
+(defn- guess-index
+  "Find the next active tab, if present this is always the right tab, otherwise is the first from left"
+  [all-tabs closed-index]
+  (let [tab-count (count all-tabs)]
+    (cond-> closed-index
+            (= (- tab-count closed-index) 1) dec)))
 
+(defn close-tab
+  "Closes the tab that matches the predicate "
+  [close-pred all-tabs]
+  (let [[closed-index closed-tab] (find-first-indexed close-pred all-tabs)
+        active-index (guess-index all-tabs closed-index)]
+    (->> all-tabs
+         (filter #(not (close-pred %)))
+         (map-indexed (fn [tab-index tab]
+                        (cond-> tab (and (::active? closed-tab)
+                                         (= active-index tab-index)) activate-tab))))))
+
+(defn close-by-id
+  [all-tabs tab-id]
+  (let [predicate #(= (::id %) tab-id)]
+    (close-tab predicate all-tabs)))
