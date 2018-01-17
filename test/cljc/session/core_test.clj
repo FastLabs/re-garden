@@ -31,10 +31,9 @@
         (is (s/valid? ::ses/inst-map s-map))
         (let [{:keys [::ses/all-inst
                       ::ses/all-active]} (ses/start-session s-map app-meta)]
-          (is (= 2 (count (ses/scan-sessions ::ses/all-inst app-meta))))
-          (is (= [[2 "app-1"]] ::ses/all-active)))))
+          (is (= 2 (count (ses/scan-sessions all-inst app-meta)))))))
 
-    '(testing "disable current active session"
+    (testing "disable current active session"
       (let [disabled-session (->> app-meta
                                   (ses/new-session 2)
                                   ses/disable-session)]

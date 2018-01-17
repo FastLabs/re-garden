@@ -11,7 +11,7 @@
                  [http-kit "2.2.0"]
                  [org.clojure/java.jdbc "0.7.0-alpha1"]
                  [compojure "1.5.2"]
-                 [garden "1.3.0"]
+                 [garden "1.3.3"]
                  [com.rpl/specter "1.0.0"]]
 
 
@@ -28,7 +28,7 @@
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.14"]
-            [lein-garden "0.2.6"]
+            [lein-garden "0.3.0"]
             [lein-doo "0.1.8"]]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"
